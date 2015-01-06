@@ -2,7 +2,7 @@
 
 [![npm](https://nodei.co/npm/uupaa.wmclock.js.png?downloads=true&stars=true)](https://nodei.co/npm/uupaa.wmclock.js/)
 
-Clock.js description.
+Master/Base Clock, Virtual timer.
 
 ## Document
 
@@ -45,14 +45,17 @@ function _tick(timeStamp, deltaTime, count) {
 
 ```js
 importScripts("lib/Clock.js");
-
-...
 ```
 
 ### Node.js
 
 ```js
 require("lib/Clock.js");
+```
 
-...
+### node-webkit
+
+```js
+<script src="lib/Clock.js"></script>
+require("lib/Clock.js");
 ```

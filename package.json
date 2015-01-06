@@ -1,6 +1,6 @@
 {
   "name": "uupaa.clock.js",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Master Clock / Base Clock",
   "url": "https://github.com/uupaa/Clock.js",
   "keywords": ["timer", "clock", "vsync", "requestAnimationFrame", "WebModule", "uupaa", "Unstable"],
@@ -32,15 +32,19 @@
     "label": ["@dev"],
     "browser": {
       "source": ["lib/Clock.js"],
-      "output": "release/Clock.min.b.js"
+      "output": "release/Clock.b.min.js"
     },
     "worker": {
       "source": ["lib/Clock.js"],
-      "output": "release/Clock.min.w.js"
+      "output": "release/Clock.w.min.js"
     },
     "node": {
       "source": ["lib/Clock.js"],
-      "output": "release/Clock.min.n.js"
+      "output": "release/Clock.n.min.js"
+    },
+    "nw": {
+      "source": ["lib/Clock.js"],
+      "output": "release/Clock.nw.min.js"
     }
   },
   "dependencies": {

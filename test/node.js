@@ -1,9 +1,8 @@
-require("../../WebModule/lib/Reflection.js");
-require("../../WebModule/lib/Console.js");
-require("../../WebModule/lib/Valid.js");
-require("../../WebModule/lib/Help.js");
-require("../../WebModule/lib/Task.js");
-require("../../WebModule/lib/Test.js");
+// Clock test
+
+require("../node_modules/uupaa.easing.js/lib/Easing.js");
+require(".././test/wmtools.js");
 require("../lib/Clock.js");
-require("../release/Clock.min.n.js");
+require("../release/Clock.n.min.js");
 require("./testcase.js");
+
