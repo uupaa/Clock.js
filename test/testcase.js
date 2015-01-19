@@ -57,7 +57,7 @@ function testClockBasic(test, pass, miss) {
     Object {timeStamp: 243, deltaTime: 17, count: 11}
  */
 /*
-    var clock = new Clock([tick], { start: true, vsync: false, speed: 100 });
+    var clock = new Clock([tick], { start: true, vsync: false, wait: 100 });
 
     function tick(timeStamp, deltaTime, count) {
         console.log({ timeStamp:timeStamp, deltaTime:deltaTime, count: count });
@@ -104,7 +104,7 @@ function testClockBasic(test, pass, miss) {
     Object {timeStamp: 1200, deltaTime: 100, count: 11}
  */
 /*
-    var clock = new Clock([tick], { start: true, vsync: false, speed: 1000, pulse: 100 });
+    var clock = new Clock([tick], { start: true, vsync: false, wait: 1000, pulse: 100 });
 
     function tick(timeStamp, deltaTime, count) {
         console.log({ timeStamp:timeStamp, deltaTime:deltaTime, count: count });
@@ -243,7 +243,7 @@ function testClockAndVSync(test, pass, miss) {
 }
 
 function testClockOnce(test, pass, miss) {
-    var clock = new Clock([], { start: true, speed: 1000 });
+    var clock = new Clock([], { start: true, wait: 1000 });
 
     clock.nth(function(timeStamp, deltaTime, count) {
         clock.stop();
@@ -252,7 +252,7 @@ function testClockOnce(test, pass, miss) {
 }
 
 function testClockOnce2(test, pass, miss) {
-    var clock = new Clock([], { start: true, speed: 1000 });
+    var clock = new Clock([], { start: true, wait: 1000 });
 
     clock.nth(function(timeStamp, deltaTime, count) {
         switch (count) {
@@ -334,7 +334,7 @@ function testVSyncPulse(test, pass, miss) {
             }
         });
 
-    var clock = new Clock([], { vsync: false, speed: 100, pulse: 20, baseTime: 0 });
+    var clock = new Clock([], { vsync: false, wait: 100, pulse: 20, baseTime: 0 });
 
     clock.nth(_tick, 10);
     clock.start();
@@ -343,7 +343,7 @@ function testVSyncPulse(test, pass, miss) {
         console.log({ timeStamp:timeStamp, deltaTime:deltaTime, count:count });
 
         // deltaTime は初回が0で、それ以降は常に20になる(pulseが20なので)
-        // speedが100なので 100ms 毎に呼ばれるが、timeStampは20msずつ増える
+        // waitが100なので 100ms 毎に呼ばれるが、timeStampは20msずつ増える
         if (timeStamp === (timeStamp | 0)) {
             if (timeStamp % 20 === 0) {
                 if (deltaTime === 0 || deltaTime === 20) {
