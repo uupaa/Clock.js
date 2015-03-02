@@ -1,6 +1,6 @@
 {
   "name": "uupaa.clock.js",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Master Clock / Base Clock",
   "url": "https://github.com/uupaa/Clock.js",
   "keywords": ["timer", "clock", "vsync", "requestAnimationFrame", "WebModule", "uupaa", "Unstable"],
