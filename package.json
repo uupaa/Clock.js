@@ -1,6 +1,6 @@
 {
   "name": "uupaa.clock.js",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "description": "Master Clock / Base Clock",
   "url": "https://github.com/uupaa/Clock.js",
   "keywords": ["timer", "clock", "vsync", "requestAnimationFrame", "WebModule", "uupaa", "Unstable"],
@@ -11,7 +11,7 @@
   "scripts": {
     "sync": "node ../WebModule/run/sync.js; npm update; node ../WebModule/run/page.js",
     "min": "node ../WebModule/run/minify.js --verbose --strict --keep --pretty",
-    "build": "node ../WebModule/run/minify.js --verbose --strict --keep --module",
+    "build": "node ../WebModule/run/minify.js --verbose --strict --keep --release",
     "watch": "node ../WebModule/run/watch.js --verbose --run hint",
     "page": "node ../WebModule/run/page.js --verbose",
     "test": "npm run min; npm run node; npm run browser",
@@ -47,10 +47,9 @@
       "output": "release/Clock.nw.min.js"
     }
   },
-  "dependencies": {
-    "uupaa.pagevisibilityevent.js": ""
-  },
+  "dependencies": {},
   "devDependencies": {
+    "uupaa.task.js": "",
     "uupaa.easing.js": ""
   },
   "lib": "./lib/",

@@ -11,6 +11,7 @@ onmessage = function(event) {
         self.console.error = function() {};
     }
 
+    importScripts("../node_modules/uupaa.task.js/lib/Task.js");
     importScripts("../node_modules/uupaa.easing.js/lib/Easing.js");
     importScripts(".././test/wmtools.js");
     importScripts("../lib/Clock.js");

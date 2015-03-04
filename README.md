@@ -18,25 +18,10 @@ Master/Base Clock, Virtual timer.
 ```js
 <script src="lib/Clock.js"></script>
 <script>
-var clock = new Clock([_tick], { vsync: true, start: true });
+var clock = new Clock([tick], { vsync: true, start: true });
 
-function _tick(timeStamp, deltaTime, count) {
-    console.log("tick:", timeStamp, deltaTime, count);
-    if (count === 9) {
-        clock.off(_tick);
-
-        clock.nth(function(timeStamp, deltaTime, count) {
-            console.log("nth:", timeStamp, deltaTime, count);
-            if (count === 9) {
-                clock.stop();
-                if (!clock.isActive()) {
-                    console.log("finished");
-                } else {
-                    console.log("error");
-                }
-            }
-        }, 10);
-    }
+function tick(timeStamp, deltaTime) {
+    // your task
 }
 </script>
 ```
@@ -45,12 +30,16 @@ function _tick(timeStamp, deltaTime, count) {
 
 ```js
 importScripts("lib/Clock.js");
+
+...
 ```
 
 ### Node.js
 
 ```js
 require("lib/Clock.js");
+
+...
 ```
 
 ### node-webkit
@@ -58,4 +47,6 @@ require("lib/Clock.js");
 ```js
 <script src="lib/Clock.js"></script>
 require("lib/Clock.js");
+
+...
 ```

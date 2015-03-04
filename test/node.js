@@ -1,5 +1,6 @@
 // Clock test
 
+require("../node_modules/uupaa.task.js/lib/Task.js");
 require("../node_modules/uupaa.easing.js/lib/Easing.js");
 require(".././test/wmtools.js");
 require("../lib/Clock.js");
