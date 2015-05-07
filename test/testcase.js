@@ -6,6 +6,14 @@ var _runOnNode       =  _isNodeOrNodeWebKit && !/native/.test(setTimeout);
 var _runOnWorker     = !_isNodeOrNodeWebKit && "WorkerLocation" in global;
 var _runOnBrowser    = !_isNodeOrNodeWebKit && "document" in global;
 
+global["BENCHMARK"] = false;
+
+if (console) {
+    if (!console.table) {
+        console.table = console.dir;
+    }
+}
+
 var test = new Test("Clock", {
         disable:    false, // disable all tests.
         browser:    true,  // enable browser test.
@@ -32,6 +40,8 @@ var test = new Test("Clock", {
         // ---
         testRelayClockVsync,
         testRelayClockVsyncPulse,
+        // ---
+        testClockNow,
     ]);
 
 function testClockOnOffResultValue(test, pass, miss) {
@@ -385,7 +395,7 @@ function testRelayClockVsyncPulse(test, pass, miss) {
     var task3 = new Task(3, function(err, buffer, task) {
             clock2.stop();
             console.table( times );
-            test.done(pass())
+            test.done(pass());
         });
 
 
@@ -400,6 +410,16 @@ function testRelayClockVsyncPulse(test, pass, miss) {
     function tick3(timeStamp, deltaTime) {
         times.push({ time: timeStamp | 0, delta: deltaTime | 0, type: "clock" });
         task3.pass();
+    }
+}
+
+function testClockNow(test, pass, miss) {
+    var clock = new Clock();
+    try {
+        clock.now();
+        test.done(pass());
+    } catch (err) {
+        test.done(miss());
     }
 }
 
