@@ -42,6 +42,8 @@ var test = new Test("Clock", {
         testRelayClockVsyncPulse,
         // ---
         testClockNow,
+        // --- spike ---
+        testClock_spike,
     ]);
 
 function testClockOnOffResultValue(test, pass, miss) {
@@ -420,6 +422,64 @@ function testClockNow(test, pass, miss) {
         test.done(pass());
     } catch (err) {
         test.done(miss());
+    }
+}
+
+function testClock_spike(test, pass, miss) {
+    // 自動でclock供給開始
+    // 大体100msごとに_tickをコールバックする (wait が 100 なため)
+    // deltaTime は正確に前回の値+20msされた値になる (pulse が 20 なため)
+    // offset が 0 なので、timeStamp は 0 から始まる
+    // spike が指定されているため、pulse の値は spike の返す加工された値になる (不整脈を演出できる)
+    var clock = new Clock([_tick], { start: true, wait: 100, pulse: 20, offset: 0, spike: _spike });
+
+    var clockCounter = 0;
+
+    // 20回試行でテスト終了
+    var task = new Task(20, function(err, buffer, task) {
+            clock.clear();
+            clock.stop();
+
+            if (err) {
+                test.done(miss())
+            } else {
+                test.done(pass())
+            }
+        });
+
+    function _tick(timeStamp, deltaTime) {
+        var count = clockCounter++;
+        console.log({ timeStamp:timeStamp, deltaTime:deltaTime, count:count });
+
+        // deltaTime は初回が0で、それ以降は常に20になる(pulseが20なので)
+        // ただし spike が値を加工した場合はその限りではない
+        // waitが100なので 100ms ±2ms 程度で呼ばれるはずだが、deltaTime は正確に20msずつ増える
+        if (count % 10 === 0) {
+            // count が 0 と 10 の場合にpulse は 20 * 2 になる
+            if (deltaTime === 40) {
+                task.pass();
+                return;
+            }
+        } else {
+            if (timeStamp === (timeStamp | 0)) {
+                if (deltaTime === 0 || deltaTime === 20) {
+                    task.pass();
+                    return;
+                }
+            }
+        }
+        task.miss();
+    }
+
+    // 10回(200ms)毎に pulse を2倍にする(不整脈を演出する)
+    function _spike(timeStamp, // @arg Number
+                    pulse,     // @arg Number
+                    counter) { // @arg Integer
+                               // @ret Number - modified pulse
+        if (counter % 10 === 0) {
+            return pulse * 2;
+        }
+        return pulse;
     }
 }
 

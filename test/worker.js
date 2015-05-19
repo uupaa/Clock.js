@@ -13,10 +13,10 @@ onmessage = function(event) {
 
     importScripts("../node_modules/uupaa.task.js/lib/Task.js");
     importScripts("../node_modules/uupaa.easing.js/lib/Easing.js");
-    importScripts(".././test/wmtools.js");
+    importScripts("wmtools.js");
     importScripts("../lib/Clock.js");
     importScripts("../release/Clock.w.min.js");
-    importScripts("./testcase.js");
+    importScripts("testcase.js");
 
     self.postMessage({ TEST_ERROR_MESSAGE: self.TEST_ERROR_MESSAGE || "" });
 };
