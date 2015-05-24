@@ -1,6 +1,6 @@
 # Clock.js [![Build Status](https://travis-ci.org/uupaa/Clock.js.png)](http://travis-ci.org/uupaa/Clock.js)
 
-[![npm](https://nodei.co/npm/uupaa.wmclock.js.png?downloads=true&stars=true)](https://nodei.co/npm/uupaa.wmclock.js/)
+[![npm](https://nodei.co/npm/uupaa.clock.js.png?downloads=true&stars=true)](https://nodei.co/npm/uupaa.clock.js/)
 
 Master/Base Clock, Virtual timer.
 
@@ -11,9 +11,9 @@ Master/Base Clock, Virtual timer.
     - [Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html)
     - [Development](https://github.com/uupaa/WebModule/wiki/Development)
 
-## How to use
+## Run on
 
-### Browser
+### Browser and node-webkit
 
 ```js
 <script src="lib/Clock.js"></script>
@@ -31,7 +31,6 @@ function tick(timeStamp, deltaTime) {
 ```js
 importScripts("lib/Clock.js");
 
-...
 ```
 
 ### Node.js
@@ -39,14 +38,5 @@ importScripts("lib/Clock.js");
 ```js
 require("lib/Clock.js");
 
-...
 ```
 
-### node-webkit
-
-```js
-<script src="lib/Clock.js"></script>
-require("lib/Clock.js");
-
-...
-```

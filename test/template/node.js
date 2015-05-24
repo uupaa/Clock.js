@@ -1,5 +1,7 @@
 // Clock test
 
+require("../lib/WebModuleGlobal.js");
+
 __MODULES__
 __WMTOOLS__
 __SOURCES__

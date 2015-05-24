@@ -1,9 +1,9 @@
 {
   "name": "uupaa.clock.js",
-  "version": "0.0.17",
-  "description": "Master Clock / Base Clock",
+  "version": "0.0.18",
+  "description": "```",
   "url": "https://github.com/uupaa/Clock.js",
-  "keywords": ["timer", "clock", "vsync", "requestAnimationFrame", "WebModule", "uupaa", "Unstable"],
+  "keywords": ["timer", "clock", "vsync", "requestAnimationFrame", "WebModule", "uupaa"],
   "repository": {
     "type": "git",
     "url": "https://github.com/uupaa/Clock.js.git"
@@ -20,7 +20,7 @@
     "browser": "open http://localhost:8000/Clock.js/test/index.html",
     "sim": "node ../WebModule/run/sim.js http://localhost:8000/Clock.js/test/index.html",
     "simx": "node ../WebModule/run/sim.js stop",
-    "hint": "jshint lib/*.js",
+    "hint": "eslint lib/*.js",
     "score": "node ../WebModule/run/score.js; open lint/plato/index.html",
     "patch": "node ../WebModule/run/patch.js",
     "setup": "node ../WebModule/run/setup.js",
@@ -47,11 +47,12 @@
       "output": "release/Clock.nw.min.js"
     }
   },
-  "dependencies": {},
-  "devDependencies": {
+  "dependencies": {
+    "uupaa.hash.js": "",
     "uupaa.task.js": "",
     "uupaa.easing.js": ""
   },
+  "devDependencies": {},
   "lib": "./lib/",
   "main": "./index.js",
   "author": "uupaa",

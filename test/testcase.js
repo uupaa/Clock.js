@@ -1,18 +1,6 @@
 var ModuleTestClock = (function(global) {
 
-var _isNodeOrNodeWebKit = !!global.global;
-var _runOnNodeWebKit =  _isNodeOrNodeWebKit &&  /native/.test(setTimeout);
-var _runOnNode       =  _isNodeOrNodeWebKit && !/native/.test(setTimeout);
-var _runOnWorker     = !_isNodeOrNodeWebKit && "WorkerLocation" in global;
-var _runOnBrowser    = !_isNodeOrNodeWebKit && "document" in global;
-
 global["BENCHMARK"] = false;
-
-if (console) {
-    if (!console.table) {
-        console.table = console.dir;
-    }
-}
 
 var test = new Test("Clock", {
         disable:    false, // disable all tests.
@@ -23,30 +11,49 @@ var test = new Test("Clock", {
         button:     true,  // show button.
         both:       true,  // test the primary and secondary modules.
         ignoreError:false, // ignore error.
+        callback:   function() {
+        },
+        errorback:  function(error) {
+        }
     }).add([
-        // ----
-        testClockOnOffResultValue,
-        testClockOptions,
-        testClockAndVSync,
-        testClockPulse,
-        // --- VSync ---
-        testVSyncOnOffResultValue,
-        testVSyncOptions,
-        testVsyncPulse,
+        // generic test
+        testClock_onOffResultValue,
+        testClock_options,
+        testClock_vsync,
+        testClock_pulse,
+        // --- vsync ---
+        testClock_vsyncOnOffResultValue,
+        testClock_vsyncOptions,
+        testClock_vsyncPulse,
         // ---
-        testClockOffset,
-        testClockOffsetClock,
-        testClockOffsetVsync,
+        testClock_offset,
+        testClock_offsetClock,
+        testClock_offsetVsync,
         // ---
-        testRelayClockVsync,
-        testRelayClockVsyncPulse,
+        testClock_relayClockVsync,
+        testClock_relayClockVsyncPulse,
         // ---
-        testClockNow,
+        testClock_now,
         // --- spike ---
         testClock_spike,
     ]);
 
-function testClockOnOffResultValue(test, pass, miss) {
+if (IN_BROWSER || IN_NW) {
+    test.add([
+        // browser and node-webkit test
+    ]);
+} else if (IN_WORKER) {
+    test.add([
+        // worker test
+    ]);
+} else if (IN_NODE) {
+    test.add([
+        // node.js and io.js test
+    ]);
+}
+
+// --- test cases ------------------------------------------
+function testClock_onOffResultValue(test, pass, miss) {
 
     var clock = new Clock([_userTick1]);
 
@@ -75,7 +82,7 @@ function testClockOnOffResultValue(test, pass, miss) {
     function _userTick2() { }
 }
 
-function testClockOptions(test, pass, miss) {
+function testClock_options(test, pass, miss) {
     var task = new Task(2, function(err, buffer, task) {
             clock.clear();
             clock.stop();
@@ -103,7 +110,7 @@ function testClockOptions(test, pass, miss) {
     }
 }
 
-function testClockAndVSync(test, pass, miss) {
+function testClock_vsync(test, pass, miss) {
     var task = new Task(2, function(err, buffer, task) { // buffer has { clock, vsync }
             clock.clear();
             vsync.clear();
@@ -141,7 +148,7 @@ function testClockAndVSync(test, pass, miss) {
     }
 }
 
-function testVSyncOnOffResultValue(test, pass, miss) {
+function testClock_vsyncOnOffResultValue(test, pass, miss) {
 
     var vsync = new Clock([_userTick1], { vsync: true });
 
@@ -170,7 +177,7 @@ function testVSyncOnOffResultValue(test, pass, miss) {
     function _userTick2() { }
 }
 
-function testVSyncOptions(test, pass, miss) {
+function testClock_vsyncOptions(test, pass, miss) {
     var task = new Task(2, function(err, buffer, task) {
             vsync.clear();
             vsync.stop();
@@ -199,7 +206,7 @@ function testVSyncOptions(test, pass, miss) {
     }
 }
 
-function testClockPulse(test, pass, miss) {
+function testClock_pulse(test, pass, miss) {
     var task = new Task(10, function(err, buffer, task) {
             clock.clear();
             clock.stop();
@@ -231,7 +238,7 @@ debugger;
     }
 }
 
-function testVsyncPulse(test, pass, miss) {
+function testClock_vsyncPulse(test, pass, miss) {
     var task = new Task(10, function(err, buffer, task) {
             clock.clear();
             clock.stop();
@@ -263,7 +270,7 @@ debugger;
     }
 }
 
-function testClockOffset(test, pass, miss) {
+function testClock_offset(test, pass, miss) {
     var offset = 1000000;
 
     var clock = new Clock([], { offset: offset });
@@ -281,7 +288,7 @@ function testClockOffset(test, pass, miss) {
     }
 }
 
-function testClockOffsetClock(test, pass, miss) {
+function testClock_offsetClock(test, pass, miss) {
     var offset = 1000000;
     var clock = new Clock([tick], { start: true, offset: offset });
     var task = new Task(10, function(err, buffer, task) {
@@ -295,7 +302,7 @@ function testClockOffsetClock(test, pass, miss) {
             var min = Math.min.apply(null, buffer);
             var average = (max - min) / 10;
 
-            console.log("testClockOffsetClock", min, max, average);
+            console.log("testClock_offsetClock", min, max, average);
 
             if (result && average <= 17) { // 16.6666 <= 17
                 test.done(pass())
@@ -314,7 +321,7 @@ function testClockOffsetClock(test, pass, miss) {
 }
 
 
-function testClockOffsetVsync(test, pass, miss) {
+function testClock_offsetVsync(test, pass, miss) {
     var offset = 1000000;
     var clock = new Clock([tick], { start: true, offset: offset, vsync: true });
     var task = new Task(10, function(err, buffer, task) {
@@ -328,7 +335,7 @@ function testClockOffsetVsync(test, pass, miss) {
             var min = Math.min.apply(null, buffer);
             var average = (max - min) / 10;
 
-            console.log("testClockOffsetVsync", min | 0, max | 0, average);
+            console.log("testClock_offsetVsync", min | 0, max | 0, average);
 
             if (result && average <= 17) { // 16.6666 <= 17
                 test.done(pass())
@@ -345,7 +352,7 @@ function testClockOffsetVsync(test, pass, miss) {
     }
 }
 
-function testRelayClockVsync(test, pass, miss) {
+function testClock_relayClockVsync(test, pass, miss) {
     var times = [];
     var clock = new Clock([tick1], { start: true });
     var vsync = null;
@@ -380,7 +387,7 @@ function testRelayClockVsync(test, pass, miss) {
     }
 }
 
-function testRelayClockVsyncPulse(test, pass, miss) {
+function testClock_relayClockVsyncPulse(test, pass, miss) {
     var times = [];
     var clock = new Clock([tick1], { start: true, pulse: 100 });
     var vsync = null;
@@ -415,7 +422,7 @@ function testRelayClockVsyncPulse(test, pass, miss) {
     }
 }
 
-function testClockNow(test, pass, miss) {
+function testClock_now(test, pass, miss) {
     var clock = new Clock();
     try {
         clock.now();
@@ -483,7 +490,8 @@ function testClock_spike(test, pass, miss) {
     }
 }
 
-return test.run().clone();
 
-})((this || 0).self || global);
+return test.run();
+
+})(GLOBAL);
 
