@@ -12,9 +12,8 @@ onmessage = function(event) {
         self.console.table = function() {};
     }
 
-    importScripts("../lib/WebModuleGlobal.js");
+    importScripts("../lib/WebModule.js");
 
-    importScripts("../node_modules/uupaa.hash.js/lib/Hash.js");
     importScripts("../node_modules/uupaa.task.js/lib/Task.js");
     importScripts("../node_modules/uupaa.easing.js/lib/Easing.js");
     importScripts("wmtools.js");

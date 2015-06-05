@@ -1,24 +1,21 @@
-# Clock.js [![Build Status](https://travis-ci.org/uupaa/Clock.js.png)](http://travis-ci.org/uupaa/Clock.js)
+# Clock.js [![Build Status](https://travis-ci.org/uupaa/Clock.js.svg)](https://travis-ci.org/uupaa/Clock.js)
 
-[![npm](https://nodei.co/npm/uupaa.clock.js.png?downloads=true&stars=true)](https://nodei.co/npm/uupaa.clock.js/)
+[![npm](https://nodei.co/npm/uupaa.clock.js.svg?downloads=true&stars=true)](https://nodei.co/npm/uupaa.clock.js/)
 
 Master/Base Clock, Virtual timer.
 
 ## Document
 
-- [Clock.js wiki](https://github.com/uupaa/Clock.js/wiki/Clock)
-- [WebModule](https://github.com/uupaa/WebModule)
-    - [Slide](http://uupaa.github.io/Slide/slide/WebModule/index.html)
-    - [Development](https://github.com/uupaa/WebModule/wiki/Development)
+- Clock.js made of [WebModule](https://github.com/uupaa/WebModule).
+- [Spec](https://github.com/uupaa/Clock.js/wiki/Clock)
 
-## Run on
-
-### Browser and node-webkit
+## Browser and NW.js(node-webkit)
 
 ```js
-<script src="lib/Clock.js"></script>
+<script src="<your-install-dir>/lib/WebModule.js"></script>
+<script src="<your-install-dir>/lib/Clock.js"></script>
 <script>
-var clock = new Clock([tick], { vsync: true, start: true });
+var clock = new WebModule.Clock([tick], { vsync: true, start: true });
 
 function tick(timeStamp, deltaTime) {
     // your task
@@ -26,17 +23,19 @@ function tick(timeStamp, deltaTime) {
 </script>
 ```
 
-### WebWorkers
+## WebWorkers
 
 ```js
-importScripts("lib/Clock.js");
+importScripts("<your-install-dir>lib/WebModule.js");
+importScripts("<your-install-dir>lib/Clock.js");
 
 ```
 
-### Node.js
+## Node.js
 
 ```js
-require("lib/Clock.js");
+require("<your-install-dir>lib/WebModule.js");
+require("<your-install-dir>lib/Clock.js");
 
 ```
 

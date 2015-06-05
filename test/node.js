@@ -1,8 +1,7 @@
 // Clock test
 
-require("../lib/WebModuleGlobal.js");
+require("../lib/WebModule.js");
 
-require("../node_modules/uupaa.hash.js/lib/Hash.js");
 require("../node_modules/uupaa.task.js/lib/Task.js");
 require("../node_modules/uupaa.easing.js/lib/Easing.js");
 require("./wmtools.js");

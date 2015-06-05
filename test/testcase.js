@@ -55,7 +55,7 @@ if (IN_BROWSER || IN_NW) {
 // --- test cases ------------------------------------------
 function testClock_onOffResultValue(test, pass, miss) {
 
-    var clock = new Clock([_userTick1]);
+    var clock = new WebModule.Clock([_userTick1]);
 
     var result2 = clock.has(_userTick1) === true; // true
 
@@ -83,7 +83,7 @@ function testClock_onOffResultValue(test, pass, miss) {
 }
 
 function testClock_options(test, pass, miss) {
-    var task = new Task(2, function(err, buffer, task) {
+    var task = new WebModule.Task(2, function(err, buffer, task) {
             clock.clear();
             clock.stop();
 
@@ -96,7 +96,7 @@ function testClock_options(test, pass, miss) {
 
     var counter1 = 0;
     var counter2 = 0;
-    var clock = new Clock([_userTick1, _userTick2], { start: true });
+    var clock = new WebModule.Clock([_userTick1, _userTick2], { start: true });
 
     function _userTick1(timeStamp, deltaTime) {
         if (counter1++ > 10) {
@@ -111,7 +111,7 @@ function testClock_options(test, pass, miss) {
 }
 
 function testClock_vsync(test, pass, miss) {
-    var task = new Task(2, function(err, buffer, task) { // buffer has { clock, vsync }
+    var task = new WebModule.Task(2, function(err, buffer, task) { // buffer has { clock, vsync }
             clock.clear();
             vsync.clear();
 
@@ -131,10 +131,10 @@ function testClock_vsync(test, pass, miss) {
         });
 
     var clockCount = 0;
-    var clock = new Clock([_clockTick], { start: true });
+    var clock = new WebModule.Clock([_clockTick], { start: true });
 
     var vsyncCount = 0;
-    var vsync = new Clock([_vsyncTick], { start: true, vsync: true });
+    var vsync = new WebModule.Clock([_vsyncTick], { start: true, vsync: true });
 
     function _clockTick(timeStamp, deltaTime) {
         if (clockCount++ === 59) {
@@ -150,7 +150,7 @@ function testClock_vsync(test, pass, miss) {
 
 function testClock_vsyncOnOffResultValue(test, pass, miss) {
 
-    var vsync = new Clock([_userTick1], { vsync: true });
+    var vsync = new WebModule.Clock([_userTick1], { vsync: true });
 
     var result2 = vsync.has(_userTick1) === true; // true
 
@@ -178,7 +178,7 @@ function testClock_vsyncOnOffResultValue(test, pass, miss) {
 }
 
 function testClock_vsyncOptions(test, pass, miss) {
-    var task = new Task(2, function(err, buffer, task) {
+    var task = new WebModule.Task(2, function(err, buffer, task) {
             vsync.clear();
             vsync.stop();
 
@@ -189,7 +189,7 @@ function testClock_vsyncOptions(test, pass, miss) {
             }
         });
 
-    var vsync = new Clock([_userTick1, _userTick2], { start: true, vsync: true });
+    var vsync = new WebModule.Clock([_userTick1, _userTick2], { start: true, vsync: true });
 
     var counter1 = 0;
     var counter2 = 0;
@@ -207,7 +207,7 @@ function testClock_vsyncOptions(test, pass, miss) {
 }
 
 function testClock_pulse(test, pass, miss) {
-    var task = new Task(10, function(err, buffer, task) {
+    var task = new WebModule.Task(10, function(err, buffer, task) {
             clock.clear();
             clock.stop();
 
@@ -219,7 +219,7 @@ function testClock_pulse(test, pass, miss) {
         });
 
     var clockCounter = 0;
-    var clock = new Clock([_tick], { start: true, wait: 100, pulse: 20, offset: 0 });
+    var clock = new WebModule.Clock([_tick], { start: true, wait: 100, pulse: 20, offset: 0 });
 
     function _tick(timeStamp, deltaTime) {
         var count = clockCounter++;
@@ -239,7 +239,7 @@ debugger;
 }
 
 function testClock_vsyncPulse(test, pass, miss) {
-    var task = new Task(10, function(err, buffer, task) {
+    var task = new WebModule.Task(10, function(err, buffer, task) {
             clock.clear();
             clock.stop();
 
@@ -251,7 +251,7 @@ function testClock_vsyncPulse(test, pass, miss) {
         });
 
     var clockCounter = 0;
-    var clock = new Clock([_tick], { start: true, vsync: true, wait: 100, pulse: 20, offset: 0 });
+    var clock = new WebModule.Clock([_tick], { start: true, vsync: true, wait: 100, pulse: 20, offset: 0 });
 
     function _tick(timeStamp, deltaTime) {
         var count = clockCounter++;
@@ -273,8 +273,8 @@ debugger;
 function testClock_offset(test, pass, miss) {
     var offset = 1000000;
 
-    var clock = new Clock([], { offset: offset });
-    var vsync = new Clock([], { offset: offset, vsync: true });
+    var clock = new WebModule.Clock([], { offset: offset });
+    var vsync = new WebModule.Clock([], { offset: offset, vsync: true });
 
     var lastTimeStamp1 = clock.lastTimeStamp;
     var lastTimeStamp2 = vsync.lastTimeStamp;
@@ -290,8 +290,8 @@ function testClock_offset(test, pass, miss) {
 
 function testClock_offsetClock(test, pass, miss) {
     var offset = 1000000;
-    var clock = new Clock([tick], { start: true, offset: offset });
-    var task = new Task(10, function(err, buffer, task) {
+    var clock = new WebModule.Clock([tick], { start: true, offset: offset });
+    var task = new WebModule.Task(10, function(err, buffer, task) {
 
             clock.stop();
             var result = buffer.every(function(v) {
@@ -323,8 +323,8 @@ function testClock_offsetClock(test, pass, miss) {
 
 function testClock_offsetVsync(test, pass, miss) {
     var offset = 1000000;
-    var clock = new Clock([tick], { start: true, offset: offset, vsync: true });
-    var task = new Task(10, function(err, buffer, task) {
+    var clock = new WebModule.Clock([tick], { start: true, offset: offset, vsync: true });
+    var task = new WebModule.Task(10, function(err, buffer, task) {
 
             clock.stop();
             var result = buffer.every(function(v) {
@@ -354,19 +354,19 @@ function testClock_offsetVsync(test, pass, miss) {
 
 function testClock_relayClockVsync(test, pass, miss) {
     var times = [];
-    var clock = new Clock([tick1], { start: true });
+    var clock = new WebModule.Clock([tick1], { start: true });
     var vsync = null;
     var clock2 = null;
 
-    var task1 = new Task(3, function(err, buffer, task) {
+    var task1 = new WebModule.Task(3, function(err, buffer, task) {
             clock.stop();
-            vsync = new Clock([tick2], { start: true, vsync: true, offset: clock.lastTimeStamp });
+            vsync = new WebModule.Clock([tick2], { start: true, vsync: true, offset: clock.lastTimeStamp });
         });
-    var task2 = new Task(3, function(err, buffer, task) {
+    var task2 = new WebModule.Task(3, function(err, buffer, task) {
             vsync.stop();
-            clock2 = new Clock([tick3], { start: true, vsync: false, offset: vsync.lastTimeStamp });
+            clock2 = new WebModule.Clock([tick3], { start: true, vsync: false, offset: vsync.lastTimeStamp });
         });
-    var task3 = new Task(3, function(err, buffer, task) {
+    var task3 = new WebModule.Task(3, function(err, buffer, task) {
             clock2.stop();
             console.table( times );
             test.done(pass())
@@ -389,19 +389,19 @@ function testClock_relayClockVsync(test, pass, miss) {
 
 function testClock_relayClockVsyncPulse(test, pass, miss) {
     var times = [];
-    var clock = new Clock([tick1], { start: true, pulse: 100 });
+    var clock = new WebModule.Clock([tick1], { start: true, pulse: 100 });
     var vsync = null;
     var clock2 = null;
 
-    var task1 = new Task(3, function(err, buffer, task) {
+    var task1 = new WebModule.Task(3, function(err, buffer, task) {
             clock.stop();
-            vsync = new Clock([tick2], { start: true, pulse: 100, vsync: true, offset: clock.lastTimeStamp });
+            vsync = new WebModule.Clock([tick2], { start: true, pulse: 100, vsync: true, offset: clock.lastTimeStamp });
         });
-    var task2 = new Task(3, function(err, buffer, task) {
+    var task2 = new WebModule.Task(3, function(err, buffer, task) {
             vsync.stop();
-            clock2 = new Clock([tick3], { start: true, pulse: 100, vsync: false, offset: vsync.lastTimeStamp });
+            clock2 = new WebModule.Clock([tick3], { start: true, pulse: 100, vsync: false, offset: vsync.lastTimeStamp });
         });
-    var task3 = new Task(3, function(err, buffer, task) {
+    var task3 = new WebModule.Task(3, function(err, buffer, task) {
             clock2.stop();
             console.table( times );
             test.done(pass());
@@ -423,7 +423,7 @@ function testClock_relayClockVsyncPulse(test, pass, miss) {
 }
 
 function testClock_now(test, pass, miss) {
-    var clock = new Clock();
+    var clock = new WebModule.Clock();
     try {
         clock.now();
         test.done(pass());
@@ -438,12 +438,12 @@ function testClock_spike(test, pass, miss) {
     // deltaTime は正確に前回の値+20msされた値になる (pulse が 20 なため)
     // offset が 0 なので、timeStamp は 0 から始まる
     // spike が指定されているため、pulse の値は spike の返す加工された値になる (不整脈を演出できる)
-    var clock = new Clock([_tick], { start: true, wait: 100, pulse: 20, offset: 0, spike: _spike });
+    var clock = new WebModule.Clock([_tick], { start: true, wait: 100, pulse: 20, offset: 0, spike: _spike });
 
     var clockCounter = 0;
 
     // 20回試行でテスト終了
-    var task = new Task(20, function(err, buffer, task) {
+    var task = new WebModule.Task(20, function(err, buffer, task) {
             clock.clear();
             clock.stop();
 
