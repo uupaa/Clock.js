@@ -12,8 +12,8 @@ Master/Base Clock, Virtual timer.
 ## Browser and NW.js(node-webkit)
 
 ```js
-<script src="<your-install-dir>/lib/WebModule.js"></script>
-<script src="<your-install-dir>/lib/Clock.js"></script>
+<script src="<module-dir>/lib/WebModule.js"></script>
+<script src="<module-dir>/lib/Clock.js"></script>
 <script>
 var clock = new WebModule.Clock([tick], { vsync: true, start: true });
 
@@ -26,16 +26,16 @@ function tick(timeStamp, deltaTime) {
 ## WebWorkers
 
 ```js
-importScripts("<your-install-dir>lib/WebModule.js");
-importScripts("<your-install-dir>lib/Clock.js");
+importScripts("<module-dir>lib/WebModule.js");
+importScripts("<module-dir>lib/Clock.js");
 
 ```
 
 ## Node.js
 
 ```js
-require("<your-install-dir>lib/WebModule.js");
-require("<your-install-dir>lib/Clock.js");
+require("<module-dir>lib/WebModule.js");
+require("<module-dir>lib/Clock.js");
 
 ```
 
