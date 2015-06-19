@@ -48,6 +48,10 @@ var test = new Test("Clock", {
         testClock_vsyncSwitchExternalPulse,
         testClock_vsyncSwitchExternalInternal,
         testClock_vsyncSwitchExternalInternalPulse,
+        // --- transform ---
+        testClock_transform,
+        testClock_transformSwitchExternal,
+        testClock_transformVsyncSwitchExternal,
     ]);
 
 if (IN_BROWSER || IN_NW) {
@@ -860,6 +864,207 @@ function testClock_vsyncSwitchExternalInternalPulse(test, pass, miss) {
         currentTask.pass();
     }
     function _tick2(timeStamp, deltaTime) { masterTimes.push(deltaTime); } // マスター用のtick
+}
+
+function testClock_transform(test, pass, miss) {
+    var task = new WebModule.Task(10, function(err, buffer, task) {
+            clock.clear();
+            clock.stop();
+
+            var result = record1.every(function(data, i) {
+                console.log(data);
+                // tick1とtick2の引数が同一オブジェクトか
+                // インデックスが正しいか
+                return data === record2[i] && data.cnt === i;
+            })
+
+            if (result) {
+                test.done(pass());
+            } else {
+                test.done(miss());
+            }
+        });
+    var record1 = [];
+    var record2 = [];
+    var count   = 0;
+
+    var clock   = new WebModule.Clock([tick1, tick2], { start: true, transform: _transform });
+
+    function tick1(data) {
+        record1.push(data); // 引数を記録
+    }
+    function tick2(data) {
+        record2.push(data); // 引数を記録
+        task.pass();
+    }
+
+    function _transform(timeStamp, deltaTime) {
+        // timeStampとdeltaTimeをオブジェクトに変換する
+        // tickは変換されたオブジェクトを受け取る
+        return { ts: timeStamp, delta: deltaTime, cnt: count++ };
+    };
+
+}
+
+function testClock_transformSwitchExternal(test, pass, miss) {
+    var task = new WebModule.Task(2, function(err, buffer, task) {
+            clock2.clear();
+            clock2.stop();
+            clock1.internal();
+            clock1.clear();
+            clock1.stop();
+
+            // マスターからdeltaTimeを受け取りつつ
+            // 自身のtransform関数を使用しているかをチェック
+            var result1 = record1.slice(0, 5).every(function(data) {
+                return data === '20ms';
+            });
+            var result2 = record1.slice(5   ).every(function(data) {
+                return data === '30ms';
+            });
+            var result3 = record2.slice(0, 5).every(function(data) {
+                return data === '20 milli secounds';
+            });
+            var result4 = record2.slice(5   ).every(function(data) {
+                return data === '30 milli secounds';
+            });
+
+            if (result1 && result2 && result3 && result4) {
+                test.done(pass());
+            } else {
+                test.done(miss());
+            }
+        });
+
+    // 二つのクロックに別のtransform関数を指定
+    var clock1   = new WebModule.Clock([_tick1], { wait: 100, pulse: 20, transform: transform1 });
+    var clock2   = new WebModule.Clock([_tick2], { wait: 100, pulse: 30, transform: transform2 });
+    var record1  = [];
+    var record2  = [];
+    var counter1 = 0;
+    var counter2 = 0;
+
+    // clock2をclock1に追従させてスタート
+    clock2.external(clock1);
+    clock1.start();
+
+    function _tick1(transformed, _) {
+        counter1++;
+        console.log (transformed, counter1);
+        record1.push(transformed);
+
+        if (counter1 === 10) {
+            task.pass();
+        }
+    }
+    function _tick2(transformed, _) {
+        counter2++;
+        console.log (transformed, counter2);
+        record2.push(transformed);
+
+        if (counter2 === 5) {
+            // clock1の元で5回呼び出されたら主従関係を入れ替える
+            // ここではまだclock1をスレーブにせずclock2を自走させるに留める
+            // ※この関数を抜けたのちclock2はスレーブの有無を確かめに行くため
+            clock1.stop();
+            clock2.internal();
+            clock2.start();
+        }
+        if (counter2 === 6) {
+            // clock2の最初の自走呼び出しでclock1をスレーブにする
+            clock1.external(clock2);
+        }
+        if (counter2 === 10) {
+            task.pass();
+        }
+    }
+    function transform1(timeStamp, deltaTime) {
+        return deltaTime+ 'ms';
+    }
+    function transform2(timeStamp, deltaTime) {
+        return deltaTime+ ' milli secounds';
+    }
+
+}
+
+function testClock_transformVsyncSwitchExternal(test, pass, miss) {
+    var task = new WebModule.Task(2, function(err, buffer, task) {
+            clock2.clear();
+            clock2.stop();
+            clock1.internal();
+            clock1.clear();
+            clock1.stop();
+
+            // マスターからdeltaTimeを受け取りつつ
+            // 自身のtransform関数を使用しているかをチェック
+            var result1 = record1.slice(0, 5).every(function(data) {
+                return data === '20ms';
+            });
+            var result2 = record1.slice(5   ).every(function(data) {
+                return data === '30ms';
+            });
+            var result3 = record2.slice(0, 5).every(function(data) {
+                return data === '20 milli secounds';
+            });
+            var result4 = record2.slice(5   ).every(function(data) {
+                return data === '30 milli secounds';
+            });
+
+            if (result1 && result2 && result3 && result4) {
+                test.done(pass());
+            } else {
+                test.done(miss());
+            }
+        });
+
+    // 二つのクロックに別のtransform関数を指定
+    var clock1   = new WebModule.Clock([_tick1], { vsync: true, pulse: 20, transform: transform1 });
+    var clock2   = new WebModule.Clock([_tick2], { vsync: true, pulse: 30, transform: transform2 });
+    var record1  = [];
+    var record2  = [];
+    var counter1 = 0;
+    var counter2 = 0;
+
+    // clock2をclock1に追従させてスタート
+    clock2.external(clock1);
+    clock1.start();
+
+    function _tick1(transformed, _) {
+        counter1++;
+        console.log (transformed, counter1);
+        record1.push(transformed);
+
+        if (counter1 === 10) {
+            task.pass();
+        }
+    }
+    function _tick2(transformed, _) {
+        counter2++;
+        console.log (transformed, counter2);
+        record2.push(transformed);
+
+        if (counter2 === 5) {
+            // clock1の元で5回呼び出されたら主従関係を入れ替える
+            // ここではまだclock1をスレーブにせずclock2を自走させるに留める
+            // ※この関数を抜けたのちclock2はスレーブの有無を確かめに行くため
+            clock1.stop();
+            clock2.internal();
+            clock2.start();
+        }
+        if (counter2 === 6) {
+            // clock2の最初の自走呼び出しでclock1をスレーブにする
+            clock1.external(clock2);
+        }
+        if (counter2 === 10) {
+            task.pass();
+        }
+    }
+    function transform1(timeStamp, deltaTime) {
+        return deltaTime+ 'ms';
+    }
+    function transform2(timeStamp, deltaTime) {
+        return deltaTime+ ' milli secounds';
+    }
 }
 
 
