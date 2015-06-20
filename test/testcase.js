@@ -36,6 +36,18 @@ var test = new Test("Clock", {
         testClock_now,
         // --- spike ---
         testClock_spike,
+        // --- master slave mode ---
+        testClock_external,
+        testClock_internal,
+        testClock_switchExternal,
+        testClock_switchExternalPulse,
+        testClock_switchExternalInternal,
+        testClock_switchExternalInternalPulse,
+        // --- vsync
+        testClock_vsyncSwitchExternal,
+        testClock_vsyncSwitchExternalPulse,
+        testClock_vsyncSwitchExternalInternal,
+        testClock_vsyncSwitchExternalInternalPulse,
     ]);
 
 if (IN_BROWSER || IN_NW) {
@@ -490,8 +502,367 @@ function testClock_spike(test, pass, miss) {
     }
 }
 
+function testClock_external(test, pass, miss) {
+    var slave  = new WebModule.Clock([_tick1]);
+    var master = new WebModule.Clock([_tick2]);
+
+    var result1 = slave.master === null; // true
+
+    slave.external(master);
+
+    var result2 = slave.master === master; // true
+
+    if (result1 && result2) {
+        test.done(pass());
+    } else {
+        test.done(miss());
+    }
+
+    function _tick1() {}
+    function _tick2() {}
+}
+
+function testClock_internal(test, pass, miss) {
+    var slave  = new WebModule.Clock([_tick1]);
+    var master = new WebModule.Clock([_tick2]);
+
+    var result1 = slave.master === null; // true
+
+    slave.external(master);
+
+    var result2 = slave.master === master; // true
+
+    slave.internal();
+
+    var result3 = slave.master === null; // true
+
+    if (result1 && result2 && result3) {
+        test.done(pass());
+    } else {
+        test.done(miss());
+    }
+
+    function _tick1() {}
+    function _tick2() {}
+}
+
+function testClock_switchExternal(test, pass, miss) {
+    var slave  = new WebModule.Clock([_tick1], { start: true });
+    var master = new WebModule.Clock([_tick2], { start: true });
+
+    var task1 = new WebModule.Task(5, function(err, buffer, task) {
+            // スレーブが5回自走したらマスターに切り替える
+            currentTask = task2;
+            slave.external(master);
+        });
+    var task2 = new WebModule.Task(5, function(err, buffer, task) {
+            // マスターの元でさらに5回tickが呼び出されたら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            if (err) {
+                test.done(miss());
+            } else {
+                test.done(pass());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        currentTask.pass();
+    }
+    function _tick2() {}
+}
+
+function testClock_switchExternalPulse(test, pass, miss) {
+    var times = [];
+
+    var slave  = new WebModule.Clock([_tick1], { start: true, wait: 100, pulse: 20 });
+    var master = new WebModule.Clock([_tick2], { start: true, wait: 150, pulse: 30 });
+
+    var task1 = new WebModule.Task(5, function(err, buffer, task) {
+            // スレーブが5回自走したらマスターに切り替える
+            currentTask = task2;
+            slave.external(master);
+        });
+    var task2 = new WebModule.Task(5, function(err, buffer, task) {
+            // マスターの元でさらに5回が呼び出されたら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            var result1 = times.slice(0, 5).every(function(x) { return x === 20; }); // true
+            var result2 = times.slice(5   ).every(function(x) { return x === 30; }); // true
+
+            if (result1 && result2) {
+                test.done(pass());
+            } else {
+                test.done(miss());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        console.log({ time: timeStamp, delta: deltaTime, master: !!slave.master });
+        times.push(deltaTime);
+        currentTask.pass();
+    }
+    function _tick2() {}
+}
+
+function testClock_switchExternalInternal(test, pass, miss) {
+    var slave  = new WebModule.Clock([_tick1], { start: true });
+    var master = new WebModule.Clock([_tick2], { start: true });
+
+    var task1 = new WebModule.Task(3, function(err, buffer, task) {
+            // スレーブが3回自走したらマスターに切り替える
+            currentTask = task2;
+            slave.external(master);
+        });
+    var task2 = new WebModule.Task(3, function(err, buffer, task) {
+            // マスターの元でさらに3回呼び出されたら再びスレーブの自走に切り替える
+            currentTask = task3;
+
+            slave.internal();
+            slave.start();
+        });
+    var task3 = new WebModule.Task(3, function(err, buffer, task) {
+            // 最後にスレーブが3回自走したら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            if (err) {
+                test.done(miss());
+            } else {
+                test.done(pass());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        currentTask.pass();
+    }
+    function _tick2() {}
+}
+
+function testClock_switchExternalInternalPulse(test, pass, miss) {
+    var times = [];
+
+    var slave  = new WebModule.Clock([_tick1], { start: true, wait: 100, pulse: 20 });
+    var master = new WebModule.Clock([_tick2], { start: true, wait: 150, pulse: 30 });
+
+    var task1 = new WebModule.Task(3, function(err, buffer, task) {
+            // スレーブが3回自走したらマスターに切り替える
+            currentTask = task2;
+
+            slave.external(master);
+        });
+    var task2 = new WebModule.Task(3, function(err, buffer, task) {
+            // マスターの元でさらに3回呼び出されたら再びスレーブの自走に切り替える
+            currentTask = task3;
+
+            slave.internal();
+            slave.start();
+        });
+    var task3 = new WebModule.Task(3, function(err, buffer, task) {
+            // 最後にスレーブが3回自走したら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            var result1 = times.slice(0, 3).every(function(x) { return x === 20; }); // true
+            var result2 = times.slice(3, 6).every(function(x) { return x === 30; }); // true
+            var result3 = times.slice(6, 9).every(function(x) { return x === 20; }); // true
+
+            if (result1 && result2 && result3) {
+                test.done(pass());
+            } else {
+                test.done(miss());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        console.log({ time: timeStamp, delta: deltaTime, master: !!slave.master });
+        times.push(deltaTime);
+        currentTask.pass();
+    }
+    function _tick2() {}
+}
+
+function testClock_vsyncSwitchExternal(test, pass, miss) {
+    var slave  = new WebModule.Clock([_tick1], { start: true });
+    var master = new WebModule.Clock([_tick2], { start: true, vsync: true });
+
+    var task1 = new WebModule.Task(5, function(err, buffer, task) {
+            // スレーブが5回自走したらマスターに切り替える
+            currentTask = task2;
+            slave.external(master);
+        });
+    var task2 = new WebModule.Task(5, function(err, buffer, task) {
+            // マスターの元でさらに5回が呼び出されたら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            if (err) {
+                test.done(miss());
+            } else {
+                test.done(pass());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        currentTask.pass();
+    }
+    function _tick2() {}
+}
+
+function testClock_vsyncSwitchExternalPulse(test, pass, miss) {
+    var slaveTimes  = [];
+    var masterTimes = [];
+
+    var slave  = new WebModule.Clock([_tick1], { start: true, pulse: 20, wait: 100  });
+    var master = null;
+
+    var task1 = new WebModule.Task(5, function(err, buffer, task) {
+            // スレーブが5回自走したらマスターに切り替える
+            currentTask = task2;
+
+            master = new WebModule.Clock([_tick2], { vsync: true });
+            slave.external(master);
+            master.start();
+        });
+    var task2 = new WebModule.Task(5, function(err, buffer, task) {
+            // マスターの元でさらに5回が呼び出されたら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            var result1 = slaveTimes.slice(0, 5).every(function(x) { return x === 20; }); // true
+            var result2 = slaveTimes.slice(5).every(function(x, i) { return x === masterTimes[i]; }); // true
+
+            if (result1 && result2) {
+                test.done(pass());
+            } else {
+                test.done(miss());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        console.log({ time: timeStamp, delta: deltaTime, master: !!slave.master });
+        slaveTimes.push(deltaTime);
+        currentTask.pass();
+    }
+    function _tick2(timeStamp, deltaTime) { masterTimes.push(deltaTime); }
+}
+
+function testClock_vsyncSwitchExternalInternal(test, pass, miss) {
+    var slave  = new WebModule.Clock([_tick1], { start: true });
+    var master = new WebModule.Clock([_tick2], { start: true, vsync: true });
+
+    var task1 = new WebModule.Task(3, function(err, buffer, task) {
+            // スレーブが3回自走したらマスターに切り替える
+            currentTask = task2;
+            slave.external(master);
+        });
+    var task2 = new WebModule.Task(3, function(err, buffer, task) {
+            // マスターの元でさらに3回呼び出されたら再びスレーブの自走に切り替える
+            currentTask = task3;
+
+            slave.internal();
+            slave.start();
+        });
+    var task3 = new WebModule.Task(3, function(err, buffer, task) {
+            // 最後にスレーブが3回自走したら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            if (err) {
+                test.done(miss());
+            } else {
+                test.done(pass());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        currentTask.pass();
+    }
+    function _tick2() {}
+}
+
+function testClock_vsyncSwitchExternalInternalPulse(test, pass, miss) {
+    var slaveTimes  = [];
+    var masterTimes = [];
+
+    var slave  = new WebModule.Clock([_tick1], { start: true, wait: 100, pulse: 20 });
+    var master = null;
+
+    var task1 = new WebModule.Task(5, function(err, buffer, task) {
+            // スレーブが5回自走したらマスターに切り替える
+            currentTask = task2;
+
+            // マスターはvsyncオプションで起動しtimeStampを順に記録していく
+            master = new WebModule.Clock([_tick2], { vsync: true });
+            slave.external(master);
+            master.start();
+        });
+    var task2 = new WebModule.Task(10, function(err, buffer, task) {
+            // マスターのもとでさらに10回呼び出されたら再びスレーブの自走に切り替える
+            currentTask = task3;
+
+            slave.internal();
+            slave.start();
+        });
+    var task3 = new WebModule.Task(5, function(err, buffer, task) {
+            // 最後にスレーブが5回自走したら終了
+            master.clear();
+            master.stop();
+            slave.internal();
+            slave.clear();
+            slave.stop();
+
+            var result1 = slaveTimes.slice(0,   5).every(function(x)    { return x === 20; }); // true
+            var result2 = slaveTimes.slice(5,  15).every(function(x, i) { return x === masterTimes[i]; }); // true
+            var result3 = slaveTimes.slice(15, 20).every(function(x)    { return x === 20; }); // true
+
+            if (result1 && result2 && result3) {
+                test.done(pass());
+            } else {
+                test.done(miss());
+            }
+        });
+    var currentTask = task1;
+
+    function _tick1(timeStamp, deltaTime) { // スレーブ用のtick
+        console.log({ time: timeStamp, delta: deltaTime, master: !!slave.master });
+        slaveTimes.push(deltaTime);
+        currentTask.pass();
+    }
+    function _tick2(timeStamp, deltaTime) { masterTimes.push(deltaTime); } // マスター用のtick
+}
+
 
 return test.run();
 
 })(GLOBAL);
-
