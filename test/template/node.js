@@ -2,6 +2,9 @@
 
 require("../lib/WebModule.js");
 
+// publish to global
+WebModule.publish = true;
+
 __MODULES__
 __WMTOOLS__
 __SOURCES__

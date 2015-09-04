@@ -14,7 +14,11 @@ onmessage = function(event) {
 
     importScripts("../lib/WebModule.js");
 
+    // publish to global
+    WebModule.publish = true;
+
     importScripts("../node_modules/uupaa.task.js/lib/Task.js");
+    importScripts("../node_modules/uupaa.task.js/lib/TaskMap.js");
     importScripts("../node_modules/uupaa.easing.js/lib/Easing.js");
     importScripts("wmtools.js");
     importScripts("../lib/Clock.js");
