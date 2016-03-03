@@ -4,12 +4,14 @@
 
 Master/Base Clock, Virtual timer.
 
-## Document
 
-- Clock.js made of [WebModule](https://github.com/uupaa/WebModule).
-- [Spec](https://github.com/uupaa/Clock.js/wiki/Clock)
+This module made of [WebModule](https://github.com/uupaa/WebModule).
 
-## Browser and NW.js(node-webkit)
+## Documentation
+- [Spec](https://github.com/uupaa/Clock.js/wiki/)
+- [API Spec](https://github.com/uupaa/Clock.js/wiki/Clock)
+
+## Browser, NW.js and Electron
 
 ```js
 <script src="<module-dir>/lib/WebModule.js"></script>

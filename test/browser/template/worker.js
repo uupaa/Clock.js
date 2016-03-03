@@ -12,18 +12,17 @@ onmessage = function(event) {
         self.console.table = function() {};
     }
 
-    importScripts("../lib/WebModule.js");
+    importScripts("../../lib/WebModule.js");
 
-    // publish to global
-    WebModule.publish = true;
+    WebModule.verify  = __WEBMODULE_VERIFY__;
+    WebModule.verbose = __WEBMODULE_VERBOSE__;
+    WebModule.publish = __WEBMODULE_PUBLISH__;
 
-    importScripts("../node_modules/uupaa.task.js/lib/Task.js");
-    importScripts("../node_modules/uupaa.task.js/lib/TaskMap.js");
-    importScripts("../node_modules/uupaa.easing.js/lib/Easing.js");
-    importScripts("wmtools.js");
-    importScripts("../lib/Clock.js");
-    importScripts("../release/Clock.w.min.js");
-    importScripts("testcase.js");
+    __MODULES__
+    __WMTOOLS__
+    __SOURCES__
+    __OUTPUT__
+    __TEST_CASE__
 
     self.postMessage(self.unitTest);
 };
